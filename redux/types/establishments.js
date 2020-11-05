@@ -1,0 +1,1 @@
+export const SET_ESTABLISHMENTS = 'Establishment::type::SET_ESTABLISHMENTS'
