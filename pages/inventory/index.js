@@ -2,30 +2,34 @@ import { Grid, Box, Typography, IconButton, Avatar, Fab, TextField, InputAdornme
 import { Add, CloseOutlined, SearchOutlined } from '@material-ui/icons'
 import { AnimatePresence, motion } from 'framer-motion'
 import { DataGrid } from '@material-ui/data-grid'
-import { useState, useEffect } from 'react'
-import Axios from 'axios'
+import { useState, useEffect, useRef } from 'react'
 import clsx from 'clsx'
 import _ from 'lodash'
 
 import GeneralLayout from '../../layouts/GeneralLayout'
 
+import { firestore } from '../../utils/firebase'
+
 import NewProductDialog from '../../components/NewProductDialog'
 import TableOverlay from '../../components/TableOverlay'
 import TableFooter from '../../components/TableFooter'
 
-import useStyles, { ANIMATIONS } from './styles'
+import useStyles, { ANIMATIONS } from './../../styles/pages/inventory'
+import { useSelector } from 'react-redux'
 
-const Inventory = ({ establishments, ...props }) => {
+const Inventory = ({ ...props }) => {
   const classes = useStyles()
+  const tableRef = useRef()
+  const activeEstablishment = useSelector(state => state.establishments.active)
   const [showDetails, setShowDetails] = useState({
     show: false,
     row: {}
   })
-  const [openNewProduct, setOpenNewProduct] = useState(false)
+  const [openNewProduct, setOpenNewProduct] = useState(true)
   const [data, setData] = useState([])
 
   const columns = [
-    { field: 'name', headerName: 'Nombre', width: 200 },
+    { field: 'name', headerName: 'Nombre', width: 300 },
     { field: 'price', headerName: 'Precio', headerAlign: 'center', width: 150, type: 'number', 
       valueFormatter: ({ value }) =>
         new Intl.NumberFormat('es-ES', {
@@ -38,14 +42,40 @@ const Inventory = ({ establishments, ...props }) => {
       valueFormatter: ({ value }) => `${ value } uni.`
     },
   ]
+  
+  async function fetchData() {
+    if (activeEstablishment && activeEstablishment.id) {
+      const establishment = await firestore.collection('establishments').doc(activeEstablishment.id)
+      await firestore.collection('products').where('establishment', '==', establishment)
+        .onSnapshot(async snapshot => {
+          const products = []
+          await snapshot.docs.forEach(element => 
+            products.push({
+              id: element.id,
+              ...element.data()
+            }))
+          setData(products)
+        })
+    }
+  }
 
   useEffect(() => {
-    if (Array.isArray(establishments)) setData(establishments.map(item => ({ id: item._id, ...item })))
-  }, [])
+    if (tableRef.current) {
+      tableRef.current.parentElement.style.height = 'auto'
+    }
+  }, [tableRef.current])
+
+  useEffect(() => {
+    fetchData()
+    setShowDetails({
+      ...showDetails,
+      show: false
+    })
+  }, [activeEstablishment])
 
   const handleSelectTable = (selection) => {
     const product = selection.rows[0]
-    if (product && product._id) {
+    if (product && product.id) {
       setShowDetails({
         show: true,
         row: product
@@ -56,27 +86,6 @@ const Inventory = ({ establishments, ...props }) => {
   return (
     <GeneralLayout contentPadding={4}>
       <Grid container spacing={2}>
-        <Grid item xs={12} classes={{ root: classes.searchbar }}>
-          <Box className={clsx(classes.card, classes.cardSearch)} width='100%' overflow='hidden'>
-            <TextField
-              placeholder='Buscar'
-              InputProps={{
-                classes: {
-                  input: classes.inputBase
-                },
-                startAdornment: (
-                  <InputAdornment classes={{ root: classes.inputAdornedStart }}>
-                    <SearchOutlined />
-                  </InputAdornment>
-                )
-              }}
-              fullWidth
-            />
-          </Box>
-          <Fab color='primary' size='small' onClick={() => setOpenNewProduct(!openNewProduct)}>
-            <Add />
-          </Fab>
-        </Grid>
         <Grid item xs={12} className={classes.content}>
           <AnimatePresence>
             <motion.div
@@ -86,11 +95,36 @@ const Inventory = ({ establishments, ...props }) => {
               animate={showDetails.show ? 'expanded' : 'collapsed'}
               variants={ANIMATIONS.tableVariants}
             >
+              <Box display='flex' justifyContent='flex-end' paddingBottom={1}>
+                <TextField
+                  label='Buscar'
+                  variant='outlined'
+                  size='small'
+                  InputProps={{
+                    endAdornment: (
+                      <InputAdornment position='end'>
+                        <SearchOutlined />
+                      </InputAdornment>
+                    )
+                  }}
+                />
+                <Fab
+                  color='primary'
+                  size='small'
+                  className={classes.dataTableControls}
+                  onClick={() => setOpenNewProduct(!openNewProduct)}
+                >
+                  <Add />
+                </Fab>
+              </Box>
               <DataGrid
+                ref={tableRef}
                 rows={data}
                 columns={columns}
+                className={classes.dataTable}
                 disableMultipleSelection
                 onSelectionChange={handleSelectTable}
+                autoHeight
                 components={{
                   noRowsOverlay: TableOverlay,
                   footer: TableFooter
@@ -135,20 +169,6 @@ const Inventory = ({ establishments, ...props }) => {
       <NewProductDialog open={openNewProduct} onClose={() => setOpenNewProduct(false)} />
     </GeneralLayout>
   )
-}
-
-Inventory.getInitialProps = async (ctx) => {
-  const response = { establishments: [] }
-  const axioscfg = ctx.req ? {baseURL:'http://localhost:3000'} : {}
-  const results = await Axios.get('/api/products', axioscfg)
-    .then(res => res.data)
-    .catch(err => console.log(err.toString()))
-  if (results && results.success) {
-    response.establishments = results.data
-    return response
-  } else {
-    return response
-  }
 }
 
 export default Inventory
