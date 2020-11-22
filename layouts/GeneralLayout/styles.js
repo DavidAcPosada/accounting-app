@@ -37,7 +37,17 @@ export default makeStyles(theme => ({
         easing: theme.transitions.easing.easeInOut
       })
     },
-
+  },
+  establishmentsAvatarActive: {
+    background: theme.palette.secondary.dark,
+    transition: theme.transitions.create('transform', {
+      duration: theme.transitions.duration.shorter,
+      easing: theme.transitions.easing.easeInOut
+    }),
+  },
+  loaderEstablishments: {
+    background: 'rgba(255, 255, 255, 0.11) !important',
+    marginBottom: theme.spacing(2)
   },
   active: {
     position: 'relative',

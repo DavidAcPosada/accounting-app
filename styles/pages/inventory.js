@@ -1,13 +1,6 @@
 import { makeStyles } from '@material-ui/core'
 
-export default makeStyles(theme => ({
-  searchbar: {
-    display: 'flex',
-    alignItems: 'center',
-    '& .MuiFab-root': {
-      marginLeft: theme.spacing(2)
-    }
-  },
+const styles = makeStyles(theme => ({
   card: {
     padding: theme.spacing(1),
     background: theme.palette.common.white,
@@ -32,8 +25,8 @@ export default makeStyles(theme => ({
     alignItems: 'flex-start'
   },
   items: {
-    height: '100%',
-    minHeight: 400
+    minHeight: 200,
+    paddingBottom: 80
   },
   details: {
     marginLeft: 15,
@@ -58,6 +51,31 @@ export default makeStyles(theme => ({
       duration: theme.transitions.duration.standard,
       easing: theme.transitions.easing.easeInOut
     })
+  },
+  dataTable: {
+    border: 'none',
+    '& .MuiDataGrid-mainGridContainer': {
+      position: 'unset',
+      paddingBottom: 0,
+      border: '1px solid #ddd',
+      borderRadius: 5,
+    },
+    '& .MuiDataGrid-columnsContainer': {
+      position: 'inherit'
+    },
+    '& .MuiDataGrid-viewport': {
+      minHeight: 250
+    },
+    '& .MuiDataGrid-window': {
+      position: 'inherit'
+    },
+    '& .MuiDataGrid-overlay': {
+      position: 'unset',
+      background: 'transparent'
+    }
+  },
+  dataTableControls: {
+    marginLeft: theme.spacing(1)
   }
 }))
 
@@ -100,3 +118,5 @@ export const ANIMATIONS = {
     }
   }
 }
+
+export default styles

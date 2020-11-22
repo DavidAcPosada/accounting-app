@@ -1,34 +1,77 @@
-import { Avatar, Box, ButtonBase, Grid, Tooltip } from '@material-ui/core'
-import AddIcon from '@material-ui/icons/Add'
-import { useEffect, useState } from 'react'
+import { useCollectionData,  } from 'react-firebase-hooks/firestore'
+import { Avatar, Box, ButtonBase, Tooltip } from '@material-ui/core'
 import { useDispatch, useSelector } from 'react-redux'
+import AddIcon from '@material-ui/icons/Add'
+import { useEffect } from 'react'
 import useStyles from './styles'
-import Axios from 'axios'
 import clsx from 'clsx'
 import _ from 'lodash'
 
-import { SET_ESTABLISHMENTS } from '../../redux/types/establishments'
+import { firestore } from './../../utils/firebase'
+
+import { SET_ESTABLISHMENTS, SET_ACTIVE_ESTABLISHMENT } from '../../redux/types/establishments'
 
 import Sidebar from '../../components/Sidebar'
+import { Skeleton } from '@material-ui/lab'
 
 function GeneralLayout({ children, contentPadding = 2 }) {
-  const dispatch = useDispatch()
-  const establishment = useSelector(state => state.establishments)
   const classes = useStyles()
+  const dispatch = useDispatch()
+  const establishmentsCollection = firestore.collection('establishments')
+  const establishment = useSelector(state => state.establishments.establishments)
+  const [establishments, loading, error] = useCollectionData(establishmentsCollection)
 
   useEffect(() => {
-    Axios.get('/api/establishments')
-      .then(res =>
+    if (!loading && !error) {
+      const finded = establishments.find(element => element.active)
+      if (finded) {
         dispatch({
-          type: SET_ESTABLISHMENTS,
-          payload: res.data.data
+          type: SET_ACTIVE_ESTABLISHMENT,
+          payload: finded
         })
-      ).catch(err => console.error(err.toString()))
-  }, [])
+      }
+      dispatch({ 
+        type: SET_ESTABLISHMENTS,
+        payload: establishments
+      })
+    }
+  }, [establishments])
 
-  const handleChangeEstablishment = (id) => {
-    Axios.post(`/api/establishments/change/${id}`)
-      .then(res => console.log(res))
+  const handleChangeEstablishment = async (id) => {
+    await establishmentsCollection.where('active', '==', true)
+      .get().then(async res => {
+        const ids = []
+        await res.forEach(item => {
+          ids.push({
+            id: item.id,
+            data: item.data()
+          })
+        })
+        return ids
+      }).then(docs => {
+        docs.forEach(doc => {
+          establishmentsCollection.doc(doc.id).update({
+            ...doc.data,
+            active: false
+          })
+        })
+      })
+    await establishmentsCollection.doc(id)
+      .get().then(res => {
+        if (res.exists) {
+          dispatch({
+            type: SET_ACTIVE_ESTABLISHMENT,
+            payload: {
+              ...res.data(),
+              id: res.id
+            }
+          })
+          establishmentsCollection.doc(res.id).update({
+            ...res.data(),
+            active: true
+          })
+        }
+      })
   }
 
   return (
@@ -37,16 +80,19 @@ function GeneralLayout({ children, contentPadding = 2 }) {
         <Box display='flex' justifyContent='center' marginY={2} marginBottom={4}>
           {[1, 2, 3].map((_, i) => <div key={i} className={classes.dot} />)}
         </Box>
-        {establishment.map(item => (
+        {!loading && establishment.map(item => (
           <Box
-            key={item._id}
+            key={item.id}
             marginBottom={2}
             className={clsx({ [classes.active]: item.active, [classes.inactive]: !item.active })}
-            onClick={() => handleChangeEstablishment(item._id)}
+            onClick={() => handleChangeEstablishment(item.id)}
           >
             <Tooltip title={_.startCase(item.name)} placement='right'>
               <ButtonBase>
-                <Avatar className={classes.establishmentsAvatar}>
+                <Avatar className={clsx({
+                  [classes.establishmentsAvatar]: true,
+                  [classes.establishmentsAvatarActive]: item.active
+                })}>
                   {
                     item.name
                     .split(' ')
@@ -58,6 +104,7 @@ function GeneralLayout({ children, contentPadding = 2 }) {
             </Tooltip>
           </Box>
         ))}
+        {loading && [1, 2, 3].map(item => (<Skeleton key={item} classes={{ root: classes.loaderEstablishments }} variant='circle' width={56} height={56} />))}
         <Box marginBottom={2}>
           <Tooltip title='Nuevo establecimiento' placement='right'>
             <ButtonBase>

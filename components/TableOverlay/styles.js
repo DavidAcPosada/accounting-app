@@ -3,6 +3,7 @@ import { makeStyles } from "@material-ui/core";
 export default makeStyles(theme => ({
   root: {
     flexDirection: 'column',
+    minHeight: 200,
     '& .ant-empty-img-1': {
       fill: theme.palette.type === 'light' ? '#aeb8c2' : '#262626',
     },
