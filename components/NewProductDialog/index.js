@@ -2,9 +2,12 @@ import { Formik } from "formik"
 import NumberFormat from "react-number-format"
 import * as yup from 'yup'
 
-import { Dialog, DialogTitle, DialogActions, Button, DialogContent, Grid, TextField, InputAdornment, Checkbox, FormControlLabel, Box } from "@material-ui/core"
+import { Dialog, DialogTitle, DialogActions, Button, DialogContent, Grid, TextField, InputAdornment, Checkbox, FormControlLabel, Box, Collapse } from "@material-ui/core"
 
 import * as MESSAGES from './../../utils/errorMessages'
+
+import { firestore } from '../../utils/firebase'
+import { useState } from "react"
 
 const VALIDATIONS = yup.object().shape({
   name: yup.string().required(MESSAGES.IS_REQUIRED),
@@ -44,9 +47,21 @@ const NumberFormatInput = ({ inputRef, onChange, onBlur, name, suffix, prefix, .
 }
 
 const NewProductDialog = ({ open, onClose }) => {
+  const [disableSendBtn, setDisableSendBtn] = useState(false)
 
   const onSubmit = (data) => {
-    console.log(data)
+    setDisableSendBtn(true)
+    delete data.unique
+    firestore.collection('establishments').where('active', '==', true)
+      .get().then(snapshotChanges => {
+        firestore.collection('products').add({
+          ...data,
+          establishment: firestore.doc(`establishments/${snapshotChanges.docs[0].id}`)
+        }).then(res => res.get().then(doc => {
+          onClose(doc.data())
+          setDisableSendBtn(false)
+        }))
+      })
   }
 
   return (
@@ -56,7 +71,7 @@ const NewProductDialog = ({ open, onClose }) => {
       initialValues={{
         name: '',
         price: '',
-        stock: '',
+        stock: 0,
         unique: true
       }}
     >
@@ -118,7 +133,7 @@ const NewProductDialog = ({ open, onClose }) => {
                   size='small'
                   name='stock'
                   fullWidth
-                  defaultValue={0}
+                  defaultValue={values.stock}
                   InputProps={{
                     inputComponent: NumberFormatInput,
                     inputProps: {
@@ -144,14 +159,19 @@ const NewProductDialog = ({ open, onClose }) => {
                   />
                 </Box>
               </Grid>
+              <Grid item xs={12}>
+                <Collapse >
+
+                </Collapse>
+              </Grid>
             </Grid>
           </DialogContent>
           <DialogActions>
             <Button size='small' onClick={(e) => {
-              onClose(e)
+              onClose()
               resetForm()
             }}>Cancelar</Button>
-            <Button size='small' color='primary' type='submit'>Guardar</Button>
+            <Button size='small' color='primary' type='submit' disabled={disableSendBtn}>Guardar</Button>
           </DialogActions>
         </Dialog>
       )}
