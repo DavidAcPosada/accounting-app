@@ -1,4 +1,4 @@
-import { Grid, Box, Typography, IconButton, Avatar, Fab, TextField, InputAdornment } from '@material-ui/core'
+import { Grid, Box, Typography, IconButton, Avatar, Fab, TextField, InputAdornment, Snackbar } from '@material-ui/core'
 import { Add, CloseOutlined, SearchOutlined } from '@material-ui/icons'
 import { AnimatePresence, motion } from 'framer-motion'
 import { DataGrid } from '@material-ui/data-grid'
@@ -16,6 +16,7 @@ import TableFooter from '../../components/TableFooter'
 
 import useStyles, { ANIMATIONS } from './../../styles/pages/inventory'
 import { useSelector } from 'react-redux'
+import { Alert } from '@material-ui/lab'
 
 const Inventory = ({ ...props }) => {
   const classes = useStyles()
@@ -27,6 +28,13 @@ const Inventory = ({ ...props }) => {
   })
   const [openNewProduct, setOpenNewProduct] = useState(true)
   const [data, setData] = useState([])
+  const [openAlert, setOpenAlert] = useState({
+    open: true,
+    message: null,
+    severity: 'success'
+  })
+
+  const handleCloseAlert = () => setOpenAlert({ ...openAlert, open: false})
 
   const columns = [
     { field: 'name', headerName: 'Nombre', width: 300 },
@@ -83,8 +91,22 @@ const Inventory = ({ ...props }) => {
     }
   }
 
+  const handleClose = (success = null) => {
+    if (success) {
+      setOpenAlert({
+        open: true,
+        severity: 'success', 
+        message: `${success?.name} guardado con exito!`
+      })
+    }
+    setOpenNewProduct(false)
+  }
+
   return (
     <GeneralLayout contentPadding={4}>
+    <Snackbar open={openAlert.open} autoHideDuration={6000} onClose={handleCloseAlert}>
+      <Alert severity={openAlert.severity} onClose={handleCloseAlert}>{openAlert.message}</Alert>
+    </Snackbar>
       <Grid container spacing={2}>
         <Grid item xs={12} className={classes.content}>
           <AnimatePresence>
@@ -166,7 +188,7 @@ const Inventory = ({ ...props }) => {
           </AnimatePresence>
         </Grid>
       </Grid>
-      <NewProductDialog open={openNewProduct} onClose={() => setOpenNewProduct(false)} />
+      <NewProductDialog open={openNewProduct} onClose={handleClose} />
     </GeneralLayout>
   )
 }
