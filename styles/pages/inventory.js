@@ -54,6 +54,7 @@ const styles = makeStyles(theme => ({
   },
   dataTable: {
     border: 'none',
+    minHeight: 250,
     '& .MuiDataGrid-mainGridContainer': {
       position: 'unset',
       paddingBottom: 0,
@@ -98,6 +99,7 @@ export const ANIMATIONS = {
   detailsVariants: {
     expanded: {
       width: ['0%', '30%', '30%'],
+      marginLeft: [0, 15, 15],
       clipPath: ['circle(0vh at 0px 0px)', 'circle(100vh at 0px 0px)', 'circle(100vh at 0px 0px)'],
       marginLeft: [0, 15, 15],
       transition: {
@@ -109,7 +111,7 @@ export const ANIMATIONS = {
     collapsed: {
       width: ['30%', '30%', '0%'],
       clipPath: ['circle(100vh at 0px 0px)', 'circle(0vh at 0px 0px)', 'circle(0vh at 0px 0px)'],
-      marginLeft: [15, 0, 0],
+      marginLeft: [15, 15, 0],
       transition: {
         delay: 0.1,
         duration: 0.7,

@@ -2,12 +2,13 @@ import { Formik } from "formik"
 import NumberFormat from "react-number-format"
 import * as yup from 'yup'
 
-import { Dialog, DialogTitle, DialogActions, Button, DialogContent, Grid, TextField, InputAdornment, Checkbox, FormControlLabel, Box, Collapse } from "@material-ui/core"
+import { Dialog, DialogTitle, DialogActions, Button, DialogContent, Grid, TextField, Checkbox, FormControlLabel, Box, Collapse } from "@material-ui/core"
 
 import * as MESSAGES from './../../utils/errorMessages'
 
 import { firestore } from '../../utils/firebase'
 import { useState } from "react"
+import { useSelector } from "react-redux"
 
 const VALIDATIONS = yup.object().shape({
   name: yup.string().required(MESSAGES.IS_REQUIRED),
@@ -47,21 +48,21 @@ const NumberFormatInput = ({ inputRef, onChange, onBlur, name, suffix, prefix, .
 }
 
 const NewProductDialog = ({ open, onClose }) => {
+  const establishment = useSelector(state => state.establishments.active)
   const [disableSendBtn, setDisableSendBtn] = useState(false)
 
-  const onSubmit = (data) => {
+  const onSubmit = (data, { resetForm }) => {
     setDisableSendBtn(true)
     delete data.unique
-    firestore.collection('establishments').where('active', '==', true)
-      .get().then(snapshotChanges => {
-        firestore.collection('products').add({
-          ...data,
-          establishment: firestore.doc(`establishments/${snapshotChanges.docs[0].id}`)
-        }).then(res => res.get().then(doc => {
-          onClose(doc.data())
-          setDisableSendBtn(false)
-        }))
-      })
+    firestore.collection('products').add({
+      ...data,
+      establishment: firestore.doc(`establishments/${establishment.id}`)
+    }).then(res => res.get().then(doc => {
+      resetForm()
+      onClose(doc.data())
+    })).finally(() => {
+      setDisableSendBtn(false)
+    })
   }
 
   return (
@@ -128,7 +129,7 @@ const NewProductDialog = ({ open, onClose }) => {
               </Grid>
               <Grid item xs={12}>
                 <TextField
-                  label='Cantidad en Stock'
+                  label='Stock inicial'
                   variant='outlined'
                   size='small'
                   name='stock'
