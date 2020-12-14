@@ -36,6 +36,7 @@ const List = (props: any) => {
       firestore.collection('sales').where('establishment', '==', establishment)
         .onSnapshot(async snapshot => {
           const details: Array<ISales> = []
+          const inProccess: Array<ISales> = []
           snapshot.docs.forEach(item => {
             const newElement = {
               id: item.id,
@@ -44,13 +45,11 @@ const List = (props: any) => {
               state: item.data().state,
               total: item.data().total
             }
-            if (item.data().state === 'PROCCESS') setSalesOnProccess([
-              ...salesOnProccess,
-              newElement
-            ])
+            if (item.data().state === 'PROCCESS') inProccess.push(newElement)
             details.push(newElement)
           })
           setSales(details)
+          setSalesOnProccess(inProccess)
           setLoad(false)
         })
     }
