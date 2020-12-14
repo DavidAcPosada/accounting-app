@@ -2,6 +2,8 @@ import { CssBaseline, ThemeProvider } from '@material-ui/core'
 import { Provider } from 'react-redux'
 import { useEffect } from 'react'
 import Head from 'next/head'
+import dayjs from 'dayjs'
+import 'dayjs/locale/es'
 
 import store from '../redux/store'
 
@@ -9,6 +11,7 @@ import theme from './../utils/theme'
 
 function MyApp({ Component, pageProps }) {
   useEffect(() => {
+    dayjs.locale('es')
     const jssStyles = document.querySelector('#jss-server-side')
     if (jssStyles) {
       jssStyles.parentElement.removeChild(jssStyles)

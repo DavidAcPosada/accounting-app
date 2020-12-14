@@ -2,6 +2,10 @@ import { createMuiTheme } from "@material-ui/core"
 
 const theme = createMuiTheme({
   typography: {
+    h2: {
+      fontFamily: 'Nunito, Arial',
+      fontWeight: 600
+    },
     h5: {
       fontFamily: 'Nunito, Arial'
     },
@@ -9,6 +13,16 @@ const theme = createMuiTheme({
       fontFamily: 'Nunito, Arial',
       '&.bold': {
         fontWeight: 'bold'
+      }
+    }
+  },
+  overrides: {
+    MuiButton: {
+      root: {
+        fontFamily: 'Nunito, Arial'
+      },
+      contained: {
+        borderRadius: 50
       }
     }
   }

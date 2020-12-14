@@ -13,8 +13,9 @@ import { SET_ESTABLISHMENTS, SET_ACTIVE_ESTABLISHMENT } from '../../redux/types/
 
 import Sidebar from '../../components/Sidebar'
 import { Skeleton } from '@material-ui/lab'
+import Loader from '../../components/Loader'
 
-function GeneralLayout({ children, contentPadding = 2 }) {
+function GeneralLayout({ children, load = false, contentPadding = 2 }) {
   const classes = useStyles()
   const dispatch = useDispatch()
   const establishmentsCollection = firestore.collection('establishments')
@@ -118,7 +119,8 @@ function GeneralLayout({ children, contentPadding = 2 }) {
       <div style={{ position: 'relative' }}>
         <Sidebar />
       </div>
-      <Box padding={contentPadding} bgcolor='#FAFAFA' width='100%' height='100vh' maxHeight='100vh'>
+      <Box padding={contentPadding} className={classes.content}>
+        <Loader open={load} />
         {children}
       </Box>
     </div>

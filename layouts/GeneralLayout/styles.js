@@ -6,7 +6,8 @@ export default makeStyles(theme => ({
     minHeight: '100vh',
     maxHeight: '100vh',
     display: 'flex',
-    alignItems: 'stretch'
+    alignItems: 'stretch',
+    overflow: 'hidden'
   },
   dot: {
     height: 5,
@@ -104,5 +105,13 @@ export default makeStyles(theme => ({
   },
   addAvatar: {
     background: 'rgba(255, 255, 255, 0.16)'
+  },
+  content: {
+    background: '#FAFAFA',
+    width: '100%',
+    height: '100vh',
+    maxHeight: '100vh',
+    overflowY: 'scroll',
+    position: 'relative'
   }
 }))
