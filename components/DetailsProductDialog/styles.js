@@ -27,6 +27,7 @@ export default makeStyles(theme => ({
 export const StatCell = withStyles({
   root: {
     fontWeight: 'bold',
-    textAlign: 'right'
+    textAlign: 'right',
+    fontFamily: 'Nunito'
   }
 })(TableCell)
