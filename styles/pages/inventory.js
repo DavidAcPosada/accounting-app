@@ -1,4 +1,5 @@
 import { makeStyles } from '@material-ui/core'
+import { blue, blueGrey, red } from '@material-ui/core/colors'
 
 const styles = makeStyles(theme => ({
   card: {
@@ -54,7 +55,7 @@ const styles = makeStyles(theme => ({
   },
   dataTable: {
     border: 'none',
-    minHeight: 250,
+    minHeight: 200,
     '& .MuiDataGrid-mainGridContainer': {
       position: 'unset',
       paddingBottom: 0,
@@ -65,7 +66,7 @@ const styles = makeStyles(theme => ({
       position: 'inherit'
     },
     '& .MuiDataGrid-viewport': {
-      minHeight: 250
+      minHeight: 200
     },
     '& .MuiDataGrid-window': {
       position: 'inherit'
@@ -77,7 +78,38 @@ const styles = makeStyles(theme => ({
   },
   dataTableControls: {
     marginLeft: theme.spacing(1)
-  }
+  },
+  btnGroup: {
+    display: 'flex',
+    '& .MuiFab-root': {
+      marginRight: theme.spacing(1),
+      color: theme.palette.common.white,
+      '&:nth-child(1)': {
+        background: blueGrey[200],
+      },
+      '&:nth-child(2)': {
+        background: blue[400],
+      },
+      '&:nth-child(3)': {
+        background: red[400]
+      }
+    }
+  },
+  container: {
+    paddingTop: theme.spacing(13)
+  },
+  hero: {
+    width: '100%',
+    height: 200,
+    borderRadius: theme.spacing(2),
+    background: blue[100],
+    display: 'flex',
+    position: 'relative'
+  },
+  heroImage: {
+    width: '30%',
+    height: '150%'
+  },
 }))
 
 export const ANIMATIONS = {

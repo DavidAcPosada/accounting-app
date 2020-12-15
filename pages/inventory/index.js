@@ -1,4 +1,4 @@
-import { Grid, Box, Fab, TextField, InputAdornment, Snackbar, ButtonGroup, Button } from '@material-ui/core'
+import { Grid, Box, Fab, TextField, InputAdornment, Snackbar, Tooltip, Typography } from '@material-ui/core'
 import { Add, Delete, Details, Edit, SearchOutlined } from '@material-ui/icons'
 import { DataGrid } from '@material-ui/data-grid'
 import { useState, useEffect } from 'react'
@@ -16,6 +16,8 @@ import NewProductDialog from '../../components/NewProductDialog'
 import TableOverlay from '../../components/TableOverlay'
 import TableFooter from '../../components/TableFooter'
 
+import InventoryImage from '../../static/image/inventory.svg'
+
 import useStyles from './../../styles/pages/inventory'
 
 const Inventory = ({ ...props }) => {
@@ -24,6 +26,7 @@ const Inventory = ({ ...props }) => {
   const [details, setDetails] = useState({ open: false, product: {} })
   const [openNewProduct, setOpenNewProduct] = useState(false)
   const [data, setData] = useState([])
+  const [load, setLoad] = useState(true)
   const [openAlert, setOpenAlert] = useState({
     open: false,
     message: null,
@@ -49,11 +52,17 @@ const Inventory = ({ ...props }) => {
     },
     {
       field: 'action', headerName: ' ', width: 180, align: 'center', renderCell: ({ data }) => (
-        <ButtonGroup size='small' variant='contained' color='secondary'>
-          <Button onClick={() => setDetails({ open: true, product: data })}><Details /></Button>
-          <Button><Edit /></Button>
-          <Button><Delete /></Button>
-        </ButtonGroup>
+        <div className={classes.btnGroup}>
+          <Tooltip title='Detalles' placement='top'>
+            <Fab size='small' onClick={() => setDetails({ open: true, product: data })}><Details /></Fab>
+          </Tooltip>
+          <Tooltip title='Editar' placement='top'>
+            <Fab size='small'><Edit /></Fab>
+          </Tooltip>
+          <Tooltip title='Borrar' placement='top'>
+            <Fab size='small'><Delete /></Fab>
+          </Tooltip>
+        </div>
       )
     }
   ]
@@ -70,6 +79,7 @@ const Inventory = ({ ...props }) => {
               ...element.data()
             }))
           setData(products)
+          setLoad(false)
         })
     }
   }
@@ -90,7 +100,7 @@ const Inventory = ({ ...props }) => {
   }, [activeEstablishment])
 
   return (
-    <GeneralLayout contentPadding={4}>
+    <GeneralLayout contentPadding={4} load={load}>
       <Snackbar
         anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
         open={openAlert.open}
@@ -99,7 +109,14 @@ const Inventory = ({ ...props }) => {
       >
         <Alert variant='filled' severity={openAlert.severity} onClose={handleCloseAlert}>{openAlert.message}</Alert>
       </Snackbar>
-      <Grid container spacing={2}>
+      <Box className={classes.hero}>
+        <InventoryImage className={classes.heroImage} />
+        <Box paddingY={2} color='#212121' height='100%' display='flex' flexDirection='column' justifyContent='center' alignItems='flex-start'>
+          <Typography variant='h2'>Inventario {activeEstablishment.name}</Typography>
+          <Typography color='textSecondary'>Inventario y registro de los productos del establecimiento seleccionado</Typography>
+        </Box> 
+      </Box>
+      <Grid container spacing={2} className={classes.container}>
         <Grid item xs={12} className={classes.content}>
           <Box
             width='100%'
@@ -128,16 +145,14 @@ const Inventory = ({ ...props }) => {
               </Fab>
             </Box>
             <DataGrid
-              ref={(ref) => ref ? ref.parentElement.style.height = 'unset' : ref }
+              // ref={(ref) => ref ? ref.parentElement.style.height = 'unset' : ref }
               rows={data}
               columns={columns}
               className={classes.dataTable}
-              disableMultipleSelection
               autoHeight
               components={{
                 noRowsOverlay: TableOverlay,
-                footer: TableFooter,
-
+                footer: TableFooter
               }}
             />
           </Box>
