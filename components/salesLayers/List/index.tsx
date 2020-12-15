@@ -45,8 +45,9 @@ const List = (props: any) => {
               state: item.data().state,
               total: item.data().total
             }
+            console.log(newElement)
             if (item.data().state === 'PROCCESS') inProccess.push(newElement)
-            details.push(newElement)
+            else details.push(newElement)
           })
           setSales(details)
           setSalesOnProccess(inProccess)
@@ -96,7 +97,7 @@ const List = (props: any) => {
           <Grid item xs={12}>
             <Typography variant='h5' className={classes.inProccessTitle}>Facturación <span className='in'>en Proceso</span></Typography>
           </Grid>
-          {sales.map((item: ISales) => (
+          {salesOnProccess.map((item: ISales) => (
             <Grid key={item.id} item xs={3}>
               <InvoiceCard key={item.id} {...item} />
             </Grid>
