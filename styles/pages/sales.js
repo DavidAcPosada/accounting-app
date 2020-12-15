@@ -9,8 +9,7 @@ export default makeStyles(theme => ({
     borderRadius: theme.spacing(2),
     background: blue[100],
     display: 'flex',
-    position: 'relative',
-    // overflow: 'hidden'
+    position: 'relative'
   },
   heroImage: {
     width: '30%',
