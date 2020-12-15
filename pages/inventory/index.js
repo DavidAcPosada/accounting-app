@@ -145,7 +145,7 @@ const Inventory = ({ ...props }) => {
               </Fab>
             </Box>
             <DataGrid
-              // ref={(ref) => ref ? ref.parentElement.style.height = 'unset' : ref }
+              ref={(ref) => ref ? ref.parentElement.style.height = 'unset' : ref }
               rows={data}
               columns={columns}
               className={classes.dataTable}
