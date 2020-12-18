@@ -1,37 +1,49 @@
-import { Avatar, Box, Drawer, List, ListItem, ListItemIcon, ListItemText, Switch, Typography } from '@material-ui/core'
+import { Avatar, Box, Drawer, List, ListItem, ListItemIcon, ListItemText, Switch, Typography, Icon, Chip } from '@material-ui/core'
 import RadioButtonUncheckedOutlinedIcon from '@material-ui/icons/RadioButtonUncheckedOutlined';
 import PersonOutlineOutlinedIcon from '@material-ui/icons/PersonOutlineOutlined'
 import SettingsOutlinedIcon from '@material-ui/icons/SettingsOutlined'
 import ReceiptOutlinedIcon from '@material-ui/icons/ReceiptOutlined'
+import { useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
 import Link from 'next/link'
-import { useState } from 'react'
 import clsx from 'clsx'
 
 import { BiRocket, BiPackage } from 'react-icons/bi'
 
 import useStyles, { useSidebarLinkStyles } from './styles'
 import { AnimatePresence, motion } from 'framer-motion';
+import { firestore } from '../../utils/firebase';
 
-const SidebarLink = ({ open, fixed, title = '', Icon = RadioButtonUncheckedOutlinedIcon, href }) => {
+const SidebarLink = ({ open, fixed, title = '', icon = 'apps', href, enable, badge, badge_text }) => {
   const { pathname } = useRouter()
   const classes = useSidebarLinkStyles()
   const active = pathname === href
 
   return (
-    <Link href={href}>
+    <Link href={enable ? href : '#'} >
       <ListItem button
         className={clsx({
           [classes.active]: active && (open || fixed),
-          [classes.sidebarItemFolded]: active && !open && !fixed
+          [classes.sidebarItemFolded]: active && !open && !fixed,
+          [classes.disabled]: !enable
         })}
       >
         <ListItemIcon>
           <Box display='flex' alignItems='center' className={clsx({ [classes.sidebarIconFolded]: active && !open && !fixed })}>
-            <Icon size={22} className={clsx({ [classes.activeIcon]: active })} />
+            <Icon size={22} className={clsx({ [classes.activeIcon]: active, 'material-icons-outlined': true })}>{icon}</Icon>
           </Box>
         </ListItemIcon>
-        <ListItemText primary={<Typography>{ title }</Typography>} />
+        <ListItemText primary={
+          <Typography className={clsx({[classes.textWithBadge]: badge})}>
+            { title }{' '}
+            {badge && (
+              <Chip
+                label={badge_text}
+                size='small'
+                color='secondary'
+              />
+            )}
+          </Typography>} />
       </ListItem>
     </Link>
   )
@@ -41,6 +53,22 @@ const Sidebar = () => {
   const classes = useStyles()
   const [open, setOpen] = useState(false)
   const [fixed, setFixed] = useState(true)
+
+  const [routes, setRoutes] = useState([])
+
+  useEffect(() => {
+    firestore.collection('routes').orderBy('order', 'asc')
+      .onSnapshot(snapshot => {
+        const results = []
+        snapshot.docs.forEach(item => {
+          results.push({
+            id: item.id,
+            ...item.data()
+          })
+        })
+        setRoutes(results)
+      })
+  }, [])
 
   return (
     <Drawer
@@ -91,14 +119,28 @@ const Sidebar = () => {
           </AnimatePresence>
         </Box>
         <List>
-          <SidebarLink href='/' Icon={BiRocket} title='Dashboard' open={open} fixed={fixed} />
-          <SidebarLink href='/inventory' Icon={BiPackage} title='Inventario' open={open} fixed={fixed} />
-          <SidebarLink href='/sales' Icon={ReceiptOutlinedIcon} title='Ventas' open={open} fixed={fixed} />
-          <SidebarLink href='/users' Icon={PersonOutlineOutlinedIcon} title='Usuarios' open={open} fixed={fixed} />
+          {routes.map(route => (
+            <SidebarLink
+              key={route.id}
+              href={route.uri}
+              icon={route.icon}
+              title={route.title}
+              open={open}
+              fixed={fixed}
+              {...route}
+            />
+          ))}
         </List>
       </Box>
       <List>
-        <SidebarLink href='/settings' Icon={SettingsOutlinedIcon} title='Configuración' open={open} fixed={fixed} />
+        <SidebarLink
+          href='/settings'
+          icon='settings'
+          title='Configuración'
+          open={open}
+          fixed={fixed}
+          enable
+        />
       </List>
     </Drawer>
   )
