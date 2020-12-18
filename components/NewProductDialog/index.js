@@ -56,6 +56,7 @@ const NewProductDialog = ({ open, onClose }) => {
     delete data.unique
     firestore.collection('products').add({
       ...data,
+      status: 1,
       establishment: firestore.doc(`establishments/${establishment.id}`)
     }).then(res => res.get().then(doc => {
       resetForm()

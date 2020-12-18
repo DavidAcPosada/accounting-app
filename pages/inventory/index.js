@@ -150,6 +150,7 @@ const Inventory = ({ ...props }) => {
               columns={columns}
               className={classes.dataTable}
               autoHeight
+              hideFooter={!data.length}
               components={{
                 noRowsOverlay: TableOverlay,
                 footer: TableFooter
