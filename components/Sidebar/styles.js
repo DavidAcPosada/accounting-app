@@ -87,6 +87,12 @@ export const useSidebarLinkStyles = makeStyles(theme => ({
       easing: theme.transitions.easing.easeInOut
     })
   },
+  disabled: {
+    color: '#DDD',
+    '& .material-icons-outlined': {
+      color: '#DDD'
+    }
+  },
   sidebarItemFolded: {
     paddingLeft: 3,
     transition: theme.transitions.create('all', {
@@ -105,5 +111,13 @@ export const useSidebarLinkStyles = makeStyles(theme => ({
       duration: theme.transitions.duration.shortest,
       easing: theme.transitions.easing.easeInOut
     })
+  },
+  textWithBadge: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    '& .MuiChip-root': {
+      fontFamily: 'Nunito'
+    }
   }
 }))

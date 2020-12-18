@@ -9,6 +9,7 @@ import GeneralLayout from '../../layouts/GeneralLayout'
 
 import useStyles, { NewInvoice } from '../../styles/pages/sales'
 import SalesScreen from '../../components/salesLayers/SalesScreen'
+import InitSaleDialog from '../../components/InitSaleDialog'
 
 const Sales = () => {
   const classes = useStyles()
@@ -16,10 +17,7 @@ const Sales = () => {
   const { query, ...router } = useRouter()
 
   const [load, setLoad] = useState<boolean>(true)
-
-  const newInvoice = () => {
-    router.push('?screen=new')
-  }
+  const [newSale, setNewSale] = useState<boolean>(false)
 
   return (
     <GeneralLayout load={load}>
@@ -29,10 +27,11 @@ const Sales = () => {
         <Box paddingX={2} color='#212121' height='100%' display='flex' flexDirection='column' justifyContent='center' alignItems='flex-start'>
           <Typography variant='h2'>Ventas {activeEstablishment.name}</Typography>
           <Typography color='textSecondary'>Detalle de facturación de ventas registradas en el sistema</Typography>
-          {!query.screen && <NewInvoice variant='contained' onClick={() => newInvoice()}>Iniciar Facturación</NewInvoice>}
+          {!query.screen && <NewInvoice variant='contained' onClick={() => setNewSale(true)}>Iniciar Facturación</NewInvoice>}
         </Box>
       </Box>
       <SalesScreen screen={query.screen} setLoad={setLoad} />
+      <InitSaleDialog open={newSale} onClose={() => setNewSale(false)} />
     </GeneralLayout>
   )
 }
