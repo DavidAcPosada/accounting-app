@@ -3,7 +3,7 @@ import Lottie from 'react-lottie'
 
 import animationData from './../../static/animations/ready.json'
 
-import { ILoader } from '../components'
+import { ILoader } from './interface'
 
 import useStyles from './styles'
 
