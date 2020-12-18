@@ -1,4 +1,4 @@
-import { Avatar, Box, Drawer, List, ListItem, ListItemIcon, ListItemText, Switch, Typography, Icon, Chip } from '@material-ui/core'
+import { Avatar, Box, Drawer, List, ListItem, ListItemIcon, ListItemText, Switch, Typography, Icon, Chip, Badge } from '@material-ui/core'
 import RadioButtonUncheckedOutlinedIcon from '@material-ui/icons/RadioButtonUncheckedOutlined';
 import PersonOutlineOutlinedIcon from '@material-ui/icons/PersonOutlineOutlined'
 import SettingsOutlinedIcon from '@material-ui/icons/SettingsOutlined'
@@ -21,30 +21,32 @@ const SidebarLink = ({ open, fixed, title = '', icon = 'apps', href, enable, bad
 
   return (
     <Link href={enable ? href : '#'} >
-      <ListItem button
-        className={clsx({
-          [classes.active]: active && (open || fixed),
-          [classes.sidebarItemFolded]: active && !open && !fixed,
-          [classes.disabled]: !enable
-        })}
-      >
-        <ListItemIcon>
-          <Box display='flex' alignItems='center' className={clsx({ [classes.sidebarIconFolded]: active && !open && !fixed })}>
-            <Icon size={22} className={clsx({ [classes.activeIcon]: active, 'material-icons-outlined': true })}>{icon}</Icon>
-          </Box>
-        </ListItemIcon>
-        <ListItemText primary={
-          <Typography className={clsx({[classes.textWithBadge]: badge})}>
-            { title }{' '}
-            {badge && (
-              <Chip
-                label={badge_text}
-                size='small'
-                color='secondary'
-              />
-            )}
-          </Typography>} />
-      </ListItem>
+        <ListItem button
+          className={clsx({
+            [classes.active]: active && (open || fixed),
+            [classes.sidebarItemFolded]: active && !open && !fixed,
+            [classes.disabled]: !enable
+          })}
+        >
+          <ListItemIcon>
+            <Box display='flex' alignItems='center' className={clsx({ [classes.sidebarIconFolded]: active && !open && !fixed })}>
+              <Badge color='secondary' variant='dot' invisible={!badge}>
+                <Icon size={22} className={clsx({ [classes.activeIcon]: active, 'material-icons-outlined': true })}>{icon}</Icon>
+              </Badge>
+            </Box>
+          </ListItemIcon>
+          <ListItemText primary={
+            <Typography className={clsx({[classes.textWithBadge]: badge})}>
+              { title }{' '}
+              {badge && (
+                <Chip
+                  label={badge_text}
+                  size='small'
+                  color='secondary'
+                />
+              )}
+            </Typography>} />
+        </ListItem>
     </Link>
   )
 }

@@ -4,7 +4,7 @@ export default makeStyles(theme => ({
   root: {
     width: '100%',
     height: '100%',
-    background: 'rgba(255, 255, 255, 0.3)',
+    background: (opacity) => `rgba(255, 255, 255, ${opacity})`,
     position: 'absolute',
     zIndex: 1,
     top: 0,
