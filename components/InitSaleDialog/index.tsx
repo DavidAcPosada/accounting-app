@@ -17,10 +17,13 @@ function getSteps() {
 const InitSaleDialog = ({ open, onClose }: IProps) => {
   const classes = useStyles()
   const activeEstablishment = useSelector((state: IStore) => state.establishments.active)
-  const [products, setProducts] = useState<Array<any>>([])
   const [activeStep, setActiveStep] = useState<number>(0)
   const [skipped, setSkipped] = useState<Set<unknown>>(new Set())
   const steps = getSteps()
+  
+  const [products, setProducts] = useState<Array<any>>([])
+  const [events, setEvents] = useState<Array<any>>([])
+  const [eventSelected, setEventSelected] = useState<Array<any>>()
 
   const isStepSkipped = (step: Set<unknown> | number) => {
     return skipped.has(step)
@@ -58,13 +61,36 @@ const InitSaleDialog = ({ open, onClose }: IProps) => {
           })
           setProducts(results)
         })
+      firestore.collection('events')
+        .where('status', '==', true)
+        .where('establishment', '==', establishment)
+        .onSnapshot(snapshot => {
+          const results: Array<any> = []
+          snapshot.docs.forEach(item => {
+            console.log(item.data())
+            results.push({
+              id: item.id,
+              ...item.data()
+            })
+          })
+          setEvents(results)
+        })
+    }
+    if (!open) {
+      setActiveStep(0)
     }
   }, [open])
 
   const getStepContent = (stepIndex: number): React.ReactElement | string => {
     switch (stepIndex) {
       case 0: return <SelectProducts products={products} handleChangeProducts={setProducts} />
-      case 1: return <SetupPrices />
+      case 1: return (
+        <SetupPrices
+          events={events}
+          eventSelected={eventSelected}
+          handleChangeEventSeleted={setEventSelected}
+        />
+      )
       default: return 'Unknown Step'
     }
   }
