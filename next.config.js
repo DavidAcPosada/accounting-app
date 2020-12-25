@@ -1,6 +1,4 @@
-const withTypescript = require('@zeit/next-typescript')
-
-module.exports = withTypescript({
+module.exports = {
   webpack(config) {
     config.module.rules.push({
       test: /.svg$/,
@@ -11,4 +9,4 @@ module.exports = withTypescript({
     })
     return config
   }
-})
+}
