@@ -1,6 +1,6 @@
 import CheckCircleOutlineIcon from '@material-ui/icons/CheckCircleOutline';
 import { Cancel, HowToVote, Pause } from "@material-ui/icons"
-import { Box, Grid, Typography } from "@material-ui/core"
+import { Box, Button, Grid, Typography } from "@material-ui/core"
 import { useEffect, useState } from "react"
 import { useSelector } from "react-redux"
 import { useRouter } from "next/router"
@@ -10,6 +10,8 @@ import _ from 'lodash'
 import { ISales, IStates } from "../../../models/sales"
 
 import { firestore } from "../../../utils/firebase"
+
+import NoResultsScreen from '../../NoResultsScreen'
 
 import useStyles, { CardState } from './styles'
 
@@ -21,7 +23,7 @@ const STATES: IStates = {
 }
 
 const List = (props: any) => {
-  const { setLoad } = props
+  const { setLoad, newSale } = props
   const classes = useStyles()
   const { query, ...router} = useRouter()
   const activeEstablishment = useSelector((state: any) => state.establishments.active)
@@ -45,7 +47,6 @@ const List = (props: any) => {
               state: item.data().state,
               total: item.data().total
             }
-            console.log(newElement)
             if (item.data().state === 'PROCCESS') inProccess.push(newElement)
             else details.push(newElement)
           })
@@ -111,6 +112,10 @@ const List = (props: any) => {
           </Grid>
         ))}
       </Grid>
+      <NoResultsScreen
+        text='Actualmente no tienes ventas en proceso, inicia una nueva facturación'
+        actionButton={<Button variant='contained' color='primary' onClick={() => newSale()}>Iniciar nueva facturación</Button>}
+      />
     </Box>
   )
 }

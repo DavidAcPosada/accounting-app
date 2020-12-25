@@ -30,7 +30,7 @@ const Sales = () => {
           {!query.screen && <NewInvoice variant='contained' onClick={() => setNewSale(true)}>Iniciar Facturación</NewInvoice>}
         </Box>
       </Box>
-      <SalesScreen screen={query.screen} setLoad={setLoad} />
+      <SalesScreen screen={query.screen} setLoad={setLoad} newSale={() => setNewSale(true)} />
       <InitSaleDialog open={newSale} onClose={() => setNewSale(false)} />
     </GeneralLayout>
   )
