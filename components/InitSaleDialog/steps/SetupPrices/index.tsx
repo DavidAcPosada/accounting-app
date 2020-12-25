@@ -1,5 +1,5 @@
 import { FormControl, FormControlLabel, FormLabel, Grid, Radio, RadioGroup, Typography, Box, IconButton, Tooltip } from "@material-ui/core"
-import { Close, TitleOutlined, Visibility } from "@material-ui/icons"
+import { Close, Visibility } from "@material-ui/icons"
 import { useState } from "react"
 
 import useStyles from './styles'
@@ -72,6 +72,7 @@ const SetupPrices = ({ events, eventSelected, handleChangeEventSeleted }: { even
           eventSelected={eventSelected}
           handleChangeEventSeleted={handleChangeEventSeleted}
         />)
+      case 2: return 
       case 0: default: return;
     }
   }
