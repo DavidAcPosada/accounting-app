@@ -1,8 +1,12 @@
-import { Button, Dialog, DialogActions, DialogTitle, IconButton, DialogContent, Stepper, Typography, Step, StepLabel } from '@material-ui/core'
+import { Button, Dialog, DialogActions, DialogTitle, IconButton, DialogContent, Stepper, Step, StepLabel } from '@material-ui/core'
 import { Close } from '@material-ui/icons'
 import { useEffect, useState } from 'react'
+import { useSelector } from 'react-redux'
+import { IStore } from '../../redux/interface'
 import { firestore } from '../../utils/firebase'
 import { ILabel, IProps, IStep } from './interface'
+import SelectProducts from './steps/SelectProducts'
+import SetupPrices from './steps/SetupPrices'
 
 import useStyles from './styles'
 
@@ -12,6 +16,7 @@ function getSteps() {
 
 const InitSaleDialog = ({ open, onClose }: IProps) => {
   const classes = useStyles()
+  const activeEstablishment = useSelector((state: IStore) => state.establishments.active)
   const [products, setProducts] = useState<Array<any>>([])
   const [activeStep, setActiveStep] = useState<number>(0)
   const [skipped, setSkipped] = useState<Set<unknown>>(new Set())
@@ -36,19 +41,33 @@ const InitSaleDialog = ({ open, onClose }: IProps) => {
   }
 
   useEffect(() => {
-    firestore.collection('products').where('status', '==', 1)
-      .onSnapshot(snapshot => {
-        const results: Array<any> = []
-        snapshot.docs.forEach(item => {
-          results.push({
-            id: item.id,
-            ...item.data(),
-            checked: true
+    if (activeEstablishment.id && open) {
+      const establishment = firestore.collection('establishments').doc(activeEstablishment.id)
+      firestore.collection('products')
+        .where('status', '==', 1)
+        .where('establishment', '==', establishment)
+        .onSnapshot(snapshot => {
+          const results: Array<any> = []
+          snapshot.docs.forEach(item => {
+            results.push({
+              id: item.id,
+              ...item.data(),
+              checked: true,
+              ref: item.ref
+            })
           })
+          setProducts(results)
         })
-        setProducts(results)
-      })
-  }, [])
+    }
+  }, [open])
+
+  const getStepContent = (stepIndex: number): React.ReactElement | string => {
+    switch (stepIndex) {
+      case 0: return <SelectProducts products={products} handleChangeProducts={setProducts} />
+      case 1: return <SetupPrices />
+      default: return 'Unknown Step'
+    }
+  }
 
   return (
     <Dialog
@@ -57,27 +76,27 @@ const InitSaleDialog = ({ open, onClose }: IProps) => {
       maxWidth='sm'
       fullWidth
       scroll='paper'
+      disableBackdropClick
+      disableEscapeKeyDown
     >
       <DialogTitle className={classes.title}>
         Iniciar nueva facturación
         <IconButton size='small' onClick={onClose} color='secondary'><Close /></IconButton>
       </DialogTitle>
-      <div>
-        <Stepper alternativeLabel activeStep={activeStep} classes={{ root: classes.stepperRoot }}>
-          {steps.map((label: string, index: number) => {
-            const stepProps: IStep = {}
-            const labelProps: ILabel = {}
-            if (isStepSkipped(index)) stepProps.completed = false
-            return (
-              <Step key={label} {...stepProps}>
-                <StepLabel {...labelProps}>{label}</StepLabel>
-              </Step>
-            )
-          })}
-        </Stepper>
-      </div>
+      <Stepper alternativeLabel activeStep={activeStep} classes={{ root: classes.stepperRoot }}>
+        {steps.map((label: string, index: number) => {
+          const stepProps: IStep = {}
+          const labelProps: ILabel = {}
+          if (isStepSkipped(index)) stepProps.completed = false
+          return (
+            <Step key={label} {...stepProps}>
+              <StepLabel {...labelProps}>{label}</StepLabel>
+            </Step>
+          )
+        })}
+      </Stepper>
       <DialogContent>
-        lorem
+        {getStepContent(activeStep)}
       </DialogContent>
       <DialogActions>
         <Button size='small' onClick={() => onClose()}>Cancelar</Button>
@@ -87,12 +106,7 @@ const InitSaleDialog = ({ open, onClose }: IProps) => {
           disabled={activeStep === 0}
           onClick={handleBack}
         >Atrás</Button>
-        <Button
-          size='small'
-          color='primary'
-          variant='contained'
-          onClick={handleNext}
-        >
+        <Button size='small' color='primary' variant='contained' onClick={handleNext}>
           {activeStep === steps.length - 1 ? 'Continuar' : 'Siguiente'}
         </Button>
       </DialogActions>

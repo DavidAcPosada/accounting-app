@@ -9,9 +9,9 @@ const Screens = {
   details: DetailsInvoice
 }
 
-const SalesScreen = ({ screen, setLoad }) => {
+const SalesScreen = ({ screen, setLoad, ...props }) => {
   const Screen = Screens[screen] || List
-  return <Screen setLoad={setLoad} />
+  return <Screen setLoad={setLoad} {...props} />
 }
 
 export default SalesScreen
