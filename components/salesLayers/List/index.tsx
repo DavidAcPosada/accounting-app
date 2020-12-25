@@ -112,10 +112,12 @@ const List = (props: any) => {
           </Grid>
         ))}
       </Grid>
-      <NoResultsScreen
-        text='Actualmente no tienes ventas en proceso, inicia una nueva facturación'
-        actionButton={<Button variant='contained' color='primary' onClick={() => newSale()}>Iniciar nueva facturación</Button>}
-      />
+      {!sales.length && (
+        <NoResultsScreen
+          text='Actualmente no tienes ventas en proceso, inicia una nueva facturación'
+          actionButton={<Button variant='contained' color='primary' onClick={() => newSale()}>Iniciar nueva facturación</Button>}
+        />
+      )}
     </Box>
   )
 }
