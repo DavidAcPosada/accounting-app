@@ -1,7 +1,7 @@
 import { Button, Dialog, DialogActions, DialogTitle, IconButton, DialogContent, Stepper, Step, StepLabel } from '@material-ui/core'
 import { Close } from '@material-ui/icons'
 import { useEffect, useState } from 'react'
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { IStore } from '../../redux/interface'
 import { firestore } from '../../utils/firebase'
 import { ILabel, IProps, IStep } from './interface'
@@ -19,9 +19,11 @@ const InitSaleDialog = ({ open, onClose }: IProps) => {
   const activeEstablishment = useSelector((state: IStore) => state.establishments.active)
   const [activeStep, setActiveStep] = useState<number>(0)
   const [skipped, setSkipped] = useState<Set<unknown>>(new Set())
+
   const steps = getSteps()
   
   const [products, setProducts] = useState<Array<any>>([])
+  const [productPrices, setProductPrices] = useState<Array<any>>([])
   const [events, setEvents] = useState<Array<any>>([])
   const [eventSelected, setEventSelected] = useState<Array<any>>()
 
@@ -60,6 +62,7 @@ const InitSaleDialog = ({ open, onClose }: IProps) => {
             })
           })
           setProducts(results)
+          setProductPrices(results)
         })
       firestore.collection('events')
         .where('status', '==', true)
@@ -89,6 +92,8 @@ const InitSaleDialog = ({ open, onClose }: IProps) => {
           events={events}
           eventSelected={eventSelected}
           handleChangeEventSeleted={setEventSelected}
+          productPrices={productPrices}
+          handleChangeProductPrices={setProductPrices}
         />
       )
       default: return 'Unknown Step'

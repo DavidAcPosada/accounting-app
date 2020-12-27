@@ -1,23 +1,19 @@
-import { Typography } from '@material-ui/core'
-import NoResults from './../../static/image/no-results.svg'
+import Secondary from './variants/Secondary'
+import Primary from './variants/Primary'
+interface INoResultsScreen {
+  variant: 'Primary' | 'Secondary',
+  text?: string,
+  actionButton?: React.ReactElement
+}
 
-import useStyles from './styles'
+const variants = {
+  Primary,
+  Secondary
+}
 
-const NoResultsScreen = ({ text, actionButton }: { text: string, actionButton?: any }) => {
-  const classes = useStyles()
-
-  return (
-    <div className={classes.root}>
-      <NoResults className={classes.image} />
-      <div>
-        <Typography variant='h3' className={classes.title}>No se encontraron resultados</Typography>
-        <Typography variant='h5'>{text}</Typography>
-        <div className={classes.buttonAction}>
-          {actionButton}
-        </div>
-      </div>
-    </div>
-  )
+const NoResultsScreen = ({ variant = 'Primary', ...props }: INoResultsScreen) => {
+  const Component = variants[variant]
+  return <Component {...props} />
 }
 
 export default NoResultsScreen
