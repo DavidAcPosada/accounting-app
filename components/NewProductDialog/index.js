@@ -1,14 +1,14 @@
+import { useSelector } from "react-redux"
+import { useState } from "react"
 import { Formik } from "formik"
-import NumberFormat from "react-number-format"
 import * as yup from 'yup'
 
 import { Dialog, DialogTitle, DialogActions, Button, DialogContent, Grid, TextField, Checkbox, FormControlLabel, Box, Collapse } from "@material-ui/core"
 
 import * as MESSAGES from './../../utils/errorMessages'
-
 import { firestore } from '../../utils/firebase'
-import { useState } from "react"
-import { useSelector } from "react-redux"
+
+import NumberFormatInput from "../NumberFormatInput"
 
 const VALIDATIONS = yup.object().shape({
   name: yup.string().required(MESSAGES.IS_REQUIRED),
@@ -18,34 +18,6 @@ const VALIDATIONS = yup.object().shape({
   stock: yup.number()
     .typeError(MESSAGES.ONLY_NUMBERS)
 })
-
-const NumberFormatInput = ({ inputRef, onChange, onBlur, name, suffix, prefix, ...other }) => {
-  return (
-    <NumberFormat
-      {...other}
-      getInputRef={inputRef}
-      onValueChange={(values) => {
-        onChange({
-          target: {
-            name,
-            value: values.value
-          }
-        })
-        onBlur({
-          target: {
-            name,
-            value: values.value
-          }
-        })
-      }}
-      thousandSeparator='.'
-      decimalSeparator=','
-      isNumericString
-      prefix={prefix}
-      suffix={suffix}
-    />
-  )
-}
 
 const NewProductDialog = ({ open, onClose }) => {
   const establishment = useSelector(state => state.establishments.active)

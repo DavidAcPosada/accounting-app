@@ -1,8 +1,25 @@
-import { FormControl, FormControlLabel, FormLabel, Grid, Radio, RadioGroup, Typography, Box, IconButton, Tooltip } from "@material-ui/core"
+import { FormControl, FormControlLabel, FormLabel, Grid, Radio, RadioGroup, Typography, Box, IconButton, Tooltip, Button } from "@material-ui/core"
 import { Close, Visibility } from "@material-ui/icons"
 import { useState } from "react"
+import NewEventDialog from "../../../NewEventDialog"
+import NoResultsScreen from "../../../NoResultsScreen"
 
 import useStyles from './styles'
+
+interface ISetupPrices {
+  events: Array<any>;
+  eventSelected: any;
+  handleChangeEventSeleted: (values: any) => void;
+  productPrices: Array<any>;
+  handleChangeProductPrices: (values: any) => void;
+}
+
+interface IEventList {
+  events: Array<any>;
+  close: () => void;
+  eventSelected: any;
+  handleChangeEventSeleted: (values: any) => void;
+}
 
 const HeaderEvent = ({ close, title }: { close: any, title: string }) => (
   <Box display='flex' justifyContent='space-between' alignItems='center'>
@@ -19,8 +36,10 @@ const EventListContainer = ({ children }: { children: any }) => (
   </Box>
 )
 
-const EventList = ({ events, close, eventSelected, handleChangeEventSeleted }: { events: Array<any>, close: any, eventSelected: any, handleChangeEventSeleted: any }) => {
+const EventList = ({ events, close, eventSelected, handleChangeEventSeleted }: IEventList) => {
   const classes = useStyles()
+  const [openNewEvent, setOpenNewEvent] = useState<boolean>(false)
+
   const handleChangeEvent = (e: React.ChangeEvent<HTMLInputElement>) => {
     handleChangeEventSeleted((e.target as HTMLInputElement).value)
   }
@@ -38,13 +57,28 @@ const EventList = ({ events, close, eventSelected, handleChangeEventSeleted }: {
             </Typography>
           } />
         ))}
+        {!events.length && (
+          <NoResultsScreen
+            variant='Secondary'
+            text='Este establecimiento no tiene ningún evento registrado'
+            actionButton={
+              <Button
+                variant='contained' 
+                size='small'
+                onClick={() => setOpenNewEvent(true)}
+              >Registrar nuevo evento</Button>}
+          />
+        )}
       </RadioGroup>
+      <NewEventDialog
+        open={openNewEvent}
+        onClose={() => setOpenNewEvent(false)}
+      />
     </EventListContainer>
   )
 }
 
-const SetupPrices = ({ events, eventSelected, handleChangeEventSeleted }: { events: Array<any>, eventSelected: any, handleChangeEventSeleted: any }) => {
-  // const classes = useStyles()
+const SetupPrices = ({ events, eventSelected, handleChangeEventSeleted, productPrices, handleChangeProductPrices }: ISetupPrices) => {
   const [selection, setSelection] = useState<number>(-1)
   
   const options = [
