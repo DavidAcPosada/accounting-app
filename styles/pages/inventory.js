@@ -81,6 +81,8 @@ const styles = makeStyles(theme => ({
   },
   btnGroup: {
     display: 'flex',
+    justifyContent: 'center',
+    width: '100%',
     '& .MuiFab-root': {
       marginRight: theme.spacing(1),
       color: theme.palette.common.white,

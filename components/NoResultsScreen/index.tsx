@@ -1,7 +1,7 @@
 import Secondary from './variants/Secondary'
 import Primary from './variants/Primary'
 interface INoResultsScreen {
-  variant: 'Primary' | 'Secondary',
+  variant?: 'Primary' | 'Secondary',
   text?: string,
   actionButton?: React.ReactElement
 }
