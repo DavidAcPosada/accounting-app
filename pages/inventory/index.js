@@ -1,4 +1,4 @@
-import { Grid, Box, Fab, TextField, InputAdornment, Snackbar, Tooltip, Typography, Dialog, DialogTitle, DialogActions, Button, Icon } from '@material-ui/core'
+import { Grid, Box, Fab, TextField, InputAdornment, Snackbar, Tooltip, Typography, Dialog, DialogTitle, DialogActions, Button, Icon, Switch } from '@material-ui/core'
 import { Add, Details, SearchOutlined } from '@material-ui/icons'
 import { DataGrid } from '@material-ui/data-grid'
 import { useState, useEffect } from 'react'
@@ -77,7 +77,7 @@ const Inventory = ({ ...props }) => {
       )
     },
     {
-      field: 'action', headerName: ' ', width: 180, align: 'center', renderCell: ({ data }) => (
+      field: 'action', headerName: 'Acciones', width: 150, headerAlign: 'center', renderCell: ({ data }) => (
         <div className={classes.btnGroup}>
           <Tooltip title='Detalles' placement='top'>
             <Fab size='small' onClick={() => setDetails({ open: true, product: data })}><Details /></Fab>
@@ -85,25 +85,30 @@ const Inventory = ({ ...props }) => {
           <Tooltip title='Editar' placement='top'>
             <Fab size='small'><Icon className='material-icons-outlined'>edit</Icon></Fab>
           </Tooltip>
-          <Tooltip title={data.status === 1 ? 'Desactivar' : 'Activar'} placement='top'>
-            <Fab
-              style={{ background: data.status === 1 ? red[400] : lightGreen[300] }}
-              size='small'
-              onClick={() => setOpenDelete({
-                open: true,
-                data: {
-                  id: data.id,
-                  name: data.name,
-                  status: data.status
-                }
-              })}
-            >
-              <Icon className='material-icons-outlined'>flip_camera_android</Icon>
-            </Fab>
-          </Tooltip>
         </div>
       )
-    }
+    },
+    {
+      field: 'status', headerName: 'Estado', headerAlign: 'center', width: 180,
+      renderCell: ({ value, data }) => (
+        <Box width='100%' display='flex' justifyContent='space-between' alignItems='center'>
+          {value === 1 ? 'Habilitado' : 'Inhabilitado'}
+          <Switch
+            color="primary"
+            name="checkedB"
+            checked={value === 1}
+            onClick={() => setOpenDelete({
+              open: true,
+              data: {
+                id: data.id,
+                name: data.name,
+                status: data.status
+              }
+            })}
+          />
+        </Box>
+      )
+    },
   ]
   
   async function fetchData() {
