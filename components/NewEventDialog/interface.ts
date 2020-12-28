@@ -5,7 +5,7 @@ export interface INewEventDialog {
 
 interface IPrices {
   product: any;
-  price: number;
+  price: number | boolean;
 }
 
 export interface IInitialValues {

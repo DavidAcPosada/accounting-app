@@ -10,8 +10,6 @@ interface ISetupPrices {
   events: Array<any>;
   eventSelected: any;
   handleChangeEventSeleted: (values: any) => void;
-  productPrices: Array<any>;
-  handleChangeProductPrices: (values: any) => void;
 }
 
 interface IEventList {
@@ -78,7 +76,7 @@ const EventList = ({ events, close, eventSelected, handleChangeEventSeleted }: I
   )
 }
 
-const SetupPrices = ({ events, eventSelected, handleChangeEventSeleted, productPrices, handleChangeProductPrices }: ISetupPrices) => {
+const SetupPrices = ({ events, eventSelected, handleChangeEventSeleted }: ISetupPrices) => {
   const [selection, setSelection] = useState<number>(-1)
   
   const options = [
