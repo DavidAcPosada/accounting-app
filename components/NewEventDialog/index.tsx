@@ -37,7 +37,7 @@ const NewEventDialog = ({ open, onClose }: INewEventDialog) => {
   const [snackAppear, setSnackAppear] = useState<boolean>(false)
   const [saved, setSaved] = useState<boolean>(false)
 
-  const saveEvent = (values: IInitialValues) => {
+  const saveEvent = (values: IInitialValues, resetForm: () => void) => {
     const establishment = firestore.collection('establishments').doc(activeEstablishment.id)
     const prices = values.prices.map((item: any) => {
       const ref = firestore.collection('products').doc(item.id)
@@ -59,6 +59,9 @@ const NewEventDialog = ({ open, onClose }: INewEventDialog) => {
           setSaved(true)
           setTimeout(() => {
             onClose()
+            setSaved(false)
+            setSnackAppear(false)
+            resetForm()
           }, 2000)
         }
       }).catch(err => {
@@ -70,7 +73,7 @@ const NewEventDialog = ({ open, onClose }: INewEventDialog) => {
       })
   }
 
-  const onSubmit = async (values: IInitialValues) => {
+  const onSubmit = async (values: IInitialValues, formikMethods: any) => {
     if (_.isEqual(values.prices, products)) {
       setSnackAppear(true)
       enqueueSnackbar('No han habido cambios en ningun producto, deseas continuar?', {
@@ -86,12 +89,17 @@ const NewEventDialog = ({ open, onClose }: INewEventDialog) => {
               closeSnackbar(key)
               setSnackAppear(false)
             }}>Cancelar</Button>
-            <Button className={classes.snackBtn} variant='outlined' onClick={() => saveEvent(values)}>Continuar</Button>
+            <Button className={classes.snackBtn} variant='outlined'
+              onClick={() => {
+                saveEvent(values, formikMethods.resetForm)
+                closeSnackbar(key)
+              }}
+            >Continuar</Button>
           </>
         )
       })
     } else {
-      saveEvent(values)
+      saveEvent(values, formikMethods.resetForm)
     }
   }
 
