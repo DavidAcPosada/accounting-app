@@ -27,15 +27,18 @@ const Loader = (props: ILoader) => {
         </>
       )}
       {type === 'READY' && (
-        <Lottie
-          height={100}
-          width={100}
-          options={{
-            animationData,
-            autoplay: true,
-            loop: false
-          }}
-        />
+        <>
+          <Lottie
+            height={100}
+            width={100}
+            options={{
+              animationData,
+              autoplay: true,
+              loop: false
+            }}
+          />
+          <Typography variant='h5' className={classes.title}>{typeof children === 'string' ? children : 'Hecho!'}</Typography>
+        </>
       )}
     </div>
   )

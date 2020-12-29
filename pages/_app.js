@@ -1,4 +1,5 @@
 import { CssBaseline, ThemeProvider } from '@material-ui/core'
+import { SnackbarProvider } from 'notistack'
 import { Provider } from 'react-redux'
 import { useEffect } from 'react'
 import Head from 'next/head'
@@ -20,15 +21,17 @@ function MyApp({ Component, pageProps }) {
 
   return (
     <Provider store={store}>
-      <Head>
-        <title>Contabilidad</title>
-        <meta name="viewport" content="minimum-scale=1, initial-scale=1, width=device-width" />
-      </Head>
-      <ThemeProvider theme={theme}>
-        <CssBaseline />
-        <Component {...pageProps} />
-      </ThemeProvider>
-    </Provider>
+        <Head>
+          <title>Contabilidad</title>
+          <meta name="viewport" content="minimum-scale=1, initial-scale=1, width=device-width" />
+        </Head>
+        <ThemeProvider theme={theme}>
+          <SnackbarProvider maxSnack={4}>
+            <CssBaseline />
+            <Component {...pageProps} />
+          </SnackbarProvider>
+        </ThemeProvider>
+      </Provider>
   )
 }
 

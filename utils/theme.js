@@ -19,9 +19,7 @@ const theme = createMuiTheme({
   overrides: {
     MuiButton: {
       root: {
-        fontFamily: 'Nunito, Arial'
-      },
-      contained: {
+        fontFamily: 'Nunito, Arial',
         borderRadius: 50
       }
     }

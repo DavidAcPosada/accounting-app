@@ -15,6 +15,9 @@ import useStyles from './styles'
 import { firestore } from "../../utils/firebase"
 import { useSelector } from "react-redux"
 import { IStore } from "../../redux/interface"
+import { useState } from "react"
+import { useSnackbar } from "notistack"
+import Loader from "../Loader"
 
 const PaperComponent = (props: PaperProps) => (
   <Draggable
@@ -26,14 +29,15 @@ const PaperComponent = (props: PaperProps) => (
   </Draggable>
 )
 
-const NewEventDialog = (props: INewEventDialog) => {
-  const { open, onClose } = props
+const NewEventDialog = ({ open, onClose }: INewEventDialog) => {
   const classes = useStyles()
   const activeEstablishment = useSelector((state: IStore) => state.establishments.active)
   const { products = [] } = useStoreProducts(false)
+  const { enqueueSnackbar, closeSnackbar } = useSnackbar()
+  const [snackAppear, setSnackAppear] = useState<boolean>(false)
+  const [saved, setSaved] = useState<boolean>(false)
 
-  const onSubmit = async (values: IInitialValues) => {
-    if (_.isEqual(values.prices, products)) console.warn('Las precios son los mismos')
+  const saveEvent = (values: IInitialValues) => {
     const establishment = firestore.collection('establishments').doc(activeEstablishment.id)
     const prices = values.prices.map((item: any) => {
       const ref = firestore.collection('products').doc(item.id)
@@ -49,8 +53,46 @@ const NewEventDialog = (props: INewEventDialog) => {
       prices,
       status: true
     }
-    console.log(data)
-    // firestore.collection('events').add(data)
+    firestore.collection('events').add(data)
+      .then((res) => {
+        if (res.id) {
+          setSaved(true)
+          setTimeout(() => {
+            onClose()
+          }, 2000)
+        }
+      }).catch(err => {
+        enqueueSnackbar(err.toString(), {
+          variant: 'error',
+          autoHideDuration: 6000,
+          anchorOrigin: { vertical: 'top', horizontal: 'right' }
+        })
+      })
+  }
+
+  const onSubmit = async (values: IInitialValues) => {
+    if (_.isEqual(values.prices, products)) {
+      setSnackAppear(true)
+      enqueueSnackbar('No han habido cambios en ningun producto, deseas continuar?', {
+        anchorOrigin: { vertical: 'top', horizontal: 'right'},
+        variant: 'warning',
+        persist: true,
+        preventDuplicate: true,
+        action: (key) => (
+          <>
+            <Button
+              className={classes.snackBtn}
+              onClick={() => {
+              closeSnackbar(key)
+              setSnackAppear(false)
+            }}>Cancelar</Button>
+            <Button className={classes.snackBtn} variant='outlined' onClick={() => saveEvent(values)}>Continuar</Button>
+          </>
+        )
+      })
+    } else {
+      saveEvent(values)
+    }
   }
 
   const upOrDown = (item: any) => {
@@ -86,6 +128,7 @@ const NewEventDialog = (props: INewEventDialog) => {
           open={open}
           fullWidth
         >
+          <Loader open={saved} type='READY'>Se ha guardado</Loader>
           <form onSubmit={handleSubmit}>
             <DialogTitle style={{ cursor: 'move' }} id='draggable-dialog-title'>
               Registrar un nuevo evento
@@ -143,12 +186,12 @@ const NewEventDialog = (props: INewEventDialog) => {
               </Table>
             </DialogContent>
             <DialogActions>
-              <Button onClick={() => { onClose(); resetForm() }}>Cancelar</Button>
+              <Button disabled={snackAppear} onClick={() => { onClose(); resetForm() }}>Cancelar</Button>
               <Button
                 variant='contained'
                 color='primary'
                 type='submit'
-                disabled={!isValid}
+                disabled={!isValid || snackAppear}
               >Guardar</Button>
             </DialogActions>
           </form> 
