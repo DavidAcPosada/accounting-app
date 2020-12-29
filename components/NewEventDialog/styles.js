@@ -11,12 +11,20 @@ export default makeStyles(theme => ({
     color: grey[600],
     display: 'flex',
     alignItems: 'center',
-    justifyContent: 'space-between'
+    justifyContent: 'space-between',
+    width: 100,
+    minWidth: 100
   },
   up: {
     color: lightGreen[500]
   },
   down: {
     color: red[400]
+  },
+  snackBtn: {
+    color: '#FFF',
+    '&.MuiButton-outlined': {
+      borderColor: '#FFF'
+    }
   }
 }))
