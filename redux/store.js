@@ -1,4 +1,6 @@
-import { createStore } from 'redux'
+import { createStore, compose } from 'redux'
 import rootReducer from './reducers/root'
 
-export default createStore(rootReducer)
+const composeEnhancers = global?.window?.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose
+
+export default createStore(rootReducer, {}, composeEnhancers())
