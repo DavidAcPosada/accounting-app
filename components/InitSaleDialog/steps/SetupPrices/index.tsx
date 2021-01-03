@@ -16,7 +16,7 @@ import NumberFormatInput from "../../../NumberFormatInput"
 import PricesSnackbar from "../../../PricesSnackbar"
 import { IDiscount, IDiscountComponent, IEventList, ISetupPrices } from "./interface"
 
-import useStyles from './styles'
+// import useStyles from './styles'
 
 const HeaderSetupPrice = ({ close, title }: { close: any, title: string }) => (
   <Box display='flex' justifyContent='space-between' alignItems='center'>
