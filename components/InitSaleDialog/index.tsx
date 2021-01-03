@@ -1,8 +1,9 @@
 import { Button, Dialog, DialogActions, DialogTitle, IconButton, DialogContent, Stepper, Step, StepLabel } from '@material-ui/core'
 import { Close } from '@material-ui/icons'
 import { useEffect, useState } from 'react'
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { IStore } from '../../redux/interface'
+import { STATUS_BUTTONS_INIT_SALE } from '../../redux/types/ui'
 import { firestore } from '../../utils/firebase'
 import { ILabel, IProps, IStep } from './interface'
 import SelectProducts from './steps/SelectProducts'
@@ -19,12 +20,26 @@ const InitSaleDialog = ({ open, onClose }: IProps) => {
   const activeEstablishment = useSelector((state: IStore) => state.establishments.active)
   const [activeStep, setActiveStep] = useState<number>(0)
   const [skipped, setSkipped] = useState<Set<unknown>>(new Set())
+  const disableControls = useSelector((state: IStore) => state.ui.initSale.disableControls)
+
+  const dispatch = useDispatch()
 
   const steps = getSteps()
   
   const [products, setProducts] = useState<Array<any>>([])
   const [events, setEvents] = useState<Array<any>>([])
   const [eventSelected, setEventSelected] = useState<Array<any>>()
+  const [priceConfig, setPriceConfig] = useState<number>(-1)
+  const [discount, setDiscount] = useState<any>({
+    all: {
+      is: false,
+      value: 0
+    },
+    some: {
+      is: false,
+      values: []
+    }
+  })
 
   const isStepSkipped = (step: Set<unknown> | number) => {
     return skipped.has(step)
@@ -68,7 +83,6 @@ const InitSaleDialog = ({ open, onClose }: IProps) => {
         .onSnapshot(snapshot => {
           const results: Array<any> = []
           snapshot.docs.forEach(item => {
-            console.log(item.data())
             results.push({
               id: item.id,
               ...item.data()
@@ -80,6 +94,10 @@ const InitSaleDialog = ({ open, onClose }: IProps) => {
     if (!open) {
       setActiveStep(0)
     }
+    dispatch({
+      type: STATUS_BUTTONS_INIT_SALE,
+      payload: false
+    })
   }, [open])
 
   const getStepContent = (stepIndex: number): React.ReactElement | string => {
@@ -90,6 +108,10 @@ const InitSaleDialog = ({ open, onClose }: IProps) => {
           events={events}
           eventSelected={eventSelected}
           handleChangeEventSeleted={setEventSelected}
+          selection={priceConfig}
+          setSelection={setPriceConfig}
+          discount={discount}
+          setDiscount={setDiscount}
         />
       )
       default: return 'Unknown Step'
@@ -126,14 +148,14 @@ const InitSaleDialog = ({ open, onClose }: IProps) => {
         {getStepContent(activeStep)}
       </DialogContent>
       <DialogActions>
-        <Button size='small' onClick={() => onClose()}>Cancelar</Button>
-        <Button 
+        <Button disabled={disableControls} size='small' onClick={() => onClose()}>Cancelar</Button>
+        <Button
           size='small'
           variant='contained'
-          disabled={activeStep === 0}
+          disabled={activeStep === 0 || disableControls}
           onClick={handleBack}
         >Atrás</Button>
-        <Button size='small' color='primary' variant='contained' onClick={handleNext}>
+        <Button disabled={disableControls} size='small' color='primary' variant='contained' onClick={handleNext}>
           {activeStep === steps.length - 1 ? 'Continuar' : 'Siguiente'}
         </Button>
       </DialogActions>

@@ -11,5 +11,9 @@ interface IEstablishmentStore {
 
 export interface IStore {
   establishments: IEstablishmentStore;
-  
+  ui: {
+    initSale: {
+      disableControls: boolean;
+    }
+  }
 }
